@@ -1,19 +1,40 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, } from 'redux-persist';
-import { persistedContactsReducer } from './createSlice';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-const reducer = {
-  contacts: persistedContactsReducer,
-};
+axios.defaults.baseURL = 'https://64932a73428c3d2035d171a9.mockapi.io/contacts/';
 
-export const store = configureStore({
-  reducer,
-  middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
-});
+export const fetchContacts = createAsyncThunk(
+  'contacts/fetchAll',
+  async (_, thunkAPI) => {
+    try {
+      const response = await axios.get('/contacts');
+      return response.data;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e.message);
+    }
+  }
+);
 
-export const persistor = persistStore(store);
+export const addContact = createAsyncThunk(
+  'contacts/addContact',
+  async (newContact, thunkAPI) => {
+    try {
+      const response = await axios.post('/contacts', newContact);
+      return response.data;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e.message);
+    }
+  }
+);
+
+export const deleteContact = createAsyncThunk(
+  'contacts/deleteContact',
+  async (contactId, thunkAPI) => {
+    try {
+      const response = await axios.delete(`/contacts/${contactId}`);
+      return response.data.id;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e.message);
+    }
+  }
+);

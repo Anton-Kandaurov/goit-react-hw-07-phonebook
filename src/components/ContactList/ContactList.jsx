@@ -1,14 +1,17 @@
-import { ContactElement } from 'components/ContactElement';
+import { ContactElement } from 'components/ContactElement/ContactElement';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { del, contactsSelector, filterSelector } from '../../redux/createSlice';
+import { deleteContact, fetchContacts } from 'redux/configureStore';
+import { selectContacts, selectFilter, selectIsLoading, } from 'redux/createSlice';
 
 export const ContactList = () => {
-  const contacts = useSelector(contactsSelector);
-  const filter = useSelector(filterSelector);
+  const contacts = useSelector(selectContacts);
+  const isLoading = useSelector(selectIsLoading);
+  const filter = useSelector(selectFilter);
   const dispatch = useDispatch();
 
-  const deleteContact = contactId => {
-    dispatch(del(contactId));
+  const delContact = contactId => {
+    dispatch(deleteContact(contactId));
   };
 
   const filteredContacts = () => {
@@ -19,17 +22,25 @@ export const ContactList = () => {
 
   const contactList = filteredContacts();
 
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
+
   return (
-    <ul>
-      {contactList.map(({ id, name, number }) => (
-        <ContactElement
-          key={id}
-          id={id}
-          name={name}
-          number={number}
-          deleteContact={deleteContact}
-        />
-      ))}
-    </ul>
+    <>
+      {isLoading && <p>Loading...</p>}
+      <ul>
+        {contactList.map(({ id, name, phone }) => (
+          <ContactElement
+            key={id}
+            id={id}
+            name={name}
+            number={phone}
+            deleteContact={delContact}
+          />
+        ))}
+      </ul>
+    </>
   );
 };

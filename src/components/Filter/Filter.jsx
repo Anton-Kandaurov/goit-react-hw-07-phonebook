@@ -1,9 +1,9 @@
 import { InputLabel, InputField } from './styled';
 import { useSelector, useDispatch } from 'react-redux';
-import { filtered, filterSelector } from '../../redux/createSlice';
+import { filtered, selectFilter } from 'redux/createSlice';
 
 export const Filter = () => {
-  const filter = useSelector(filterSelector);
+  const filter = useSelector(selectFilter);
   const dispatch = useDispatch();
 
   const changeFilter = event => {
